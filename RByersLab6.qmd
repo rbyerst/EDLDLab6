@@ -1,0 +1,78 @@
+---
+title: "Rachel Byers Lab 6"
+format:
+  dashboard:
+    axe: true
+---
+
+#  {.sidebar}
+
+These charts are from Lab 4 and demonstrate the importance of the use of color in data visualization.
+
+# Penguins Data Charts
+
+## Row {height="50%"}
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, results = "hide")
+options(repos=c(CRAN="https://cran.r-project.org"))
+#| echo: false
+#| title: Bill Length vs. Bill Depth
+library(tidyverse)
+library(palmerpenguins)
+library(viridis)
+library(RColorBrewer)
+library(colorspace)
+library(ggrepel)
+library(colorblindr)
+library(remotes)
+library(gghighlight)
+library(ggplot2)
+library(plotly)
+LengthxBill2 <- ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+geom_point(size = 3, alpha = 0.7) +
+labs(title = "Scatterplot of Bill Length vs. Bill Depth by Species", x = "Bill Length", y = "Bill Depth") +
+scale_color_brewer(palette = "Set2") + theme_bw()
+LengthxBill2
+```
+
+------------------------------------------------------------------------
+
+## Mean Mass and County by Species
+
+##  {height="50%"}
+
+##  {.tabset}
+
+```{r}
+#| echo: false
+#| title: Mean Mass by Species and Sex
+penguin_summary <- penguins %>%
+  drop_na(sex) %>%
+  group_by(species, sex) %>%
+  summarize(mean_mass = mean(body_mass_g), .groups = "drop")
+
+SpeciesHeatmap <- ggplot(penguin_summary, aes(species, sex)) +
+  geom_tile(aes(fill = mean_mass), colour = "white") + labs(title = "Heatmap of Mean Body Mass", x = "Species", y = "Sex") +
+  scale_fill_distiller(palette = "RdBu", direction = -1) +geom_text(aes(label = mean_mass))
+SpeciesHeatmap
+```
+
+```{r}
+#| echo: false
+#| title: Count by Species
+penguinscount <- penguins %>% count(year, species)
+penguinscount <- as.data.frame(penguinscount)
+CountxSpeciesBetter <- ggplot(penguinscount, aes(x = species, y = n, fill = species)) +
+  geom_bar(stat="identity") + theme_minimal() + labs(title = "Penguin Count by Species", x = "Species", y = "Cost") + scale_fill_brewer(palette = "Dark2")
+CountxSpeciesBetter
+```
+
+# Checking for Accessibility
+
+Checking for color blindness accessibility using cvd_grid:
+
+```{r}
+#| echo: false
+cvd_grid(CountxSpeciesBetter)
+```
